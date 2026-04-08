@@ -50,6 +50,7 @@
         <version.modello.plugin>1.0.2</version.modello.plugin>
         <version.guice.plugin>2.2.0</version.guice.plugin>
         <version.gmaven.plugin>1.0</version.gmaven.plugin>
+        <version.site.plugin>3.12.1</version.site.plugin>
 
         <!-- maven-compiler-plugin -->
         <!-- Overide jboss-parent default version-->

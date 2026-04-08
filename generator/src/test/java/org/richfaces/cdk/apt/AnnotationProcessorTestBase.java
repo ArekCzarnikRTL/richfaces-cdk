@@ -105,11 +105,24 @@ public abstract class AnnotationProcessorTestBase extends CdkTestBase {
             CdkClassLoader cdkClassLoader = createClassLoader();
             binder.bind(CdkClassLoader.class).toInstance(cdkClassLoader);
             List<File> sourceFiles = new ArrayList<File>();
+            List<File> sourceFolders = new ArrayList<File>();
             for (String src : sources()) {
-                sourceFiles.add(getJavaFile(src));
+                File javaFile = getJavaFile(src);
+                sourceFiles.add(javaFile);
+                // Derive the classpath root from the source file path so that
+                // javac can resolve sibling classes (e.g. TestClass, TestInterface)
+                // referenced from the explicitly compiled sources.
+                String relative = src.replace('/', File.separatorChar);
+                String absolute = javaFile.getAbsolutePath();
+                if (absolute.endsWith(relative)) {
+                    File root = new File(absolute.substring(0, absolute.length() - relative.length()));
+                    if (!sourceFolders.contains(root)) {
+                        sourceFolders.add(root);
+                    }
+                }
             }
             binder.bind(FileManager.class).annotatedWith(new SourceImpl(Sources.JAVA_SOURCES))
-                    .toInstance(new SourceFileManagerImpl(sourceFiles, null /* this.testSourceDirectory */));
+                    .toInstance(new SourceFileManagerImpl(sourceFiles, sourceFolders));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
